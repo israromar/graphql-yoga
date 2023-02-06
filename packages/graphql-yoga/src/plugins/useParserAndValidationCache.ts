@@ -3,17 +3,28 @@ import type { DocumentNode, parse, validate } from 'graphql'
 import LRU from 'lru-cache'
 import type { Plugin } from './types.js'
 
-// eslint-disable-next-line @typescript-eslint/ban-types
-export function useParserAndValidationCache(): Plugin<{}> {
-  const parserResultCache = new LRU<string, DocumentNode>({
-    max: 1024,
-  })
-  const parserErrorCache = new LRU<string, Error>({
-    max: 1024,
-  })
-  const memoizedValidateByRules = new LRU<string, typeof validate>({
-    max: 1024,
-  })
+interface Cache<T> {
+  get(key: string): T | undefined
+  set(key: string, value: T): void
+}
+
+export interface ParserAndValidationCacheOptions {
+  documentCache?: Cache<DocumentNode>
+  errorCache?: Cache<unknown>
+  validationCache?: boolean
+}
+
+function createLRUCache<T>(): Cache<T> {
+  return new LRU<string, T>({ max: 1024 })
+}
+
+export function useParserAndValidationCache({
+  documentCache = createLRUCache(),
+  errorCache = createLRUCache(),
+  validationCache = true,
+}: // eslint-disable-next-line @typescript-eslint/ban-types
+ParserAndValidationCacheOptions): Plugin<{}> {
+  const memoizedValidateByRules = createLRUCache<typeof validate>()
   return {
     onParse({
       parseFn,
@@ -24,19 +35,19 @@ export function useParserAndValidationCache(): Plugin<{}> {
     }) {
       setParseFn(function memoizedParse(source) {
         const strDocument = typeof source === 'string' ? source : source.body
-        let document = parserResultCache.get(strDocument)
+        let document = documentCache.get(strDocument)
         if (!document) {
-          const parserError = parserErrorCache.get(strDocument)
+          const parserError = errorCache.get(strDocument)
           if (parserError) {
             throw parserError
           }
           try {
             document = parseFn(source)
           } catch (e) {
-            parserErrorCache.set(strDocument, e as Error)
+            errorCache.set(strDocument, e)
             throw e
           }
-          parserResultCache.set(strDocument, document)
+          documentCache.set(strDocument, document)
         }
         return document
       })
@@ -48,15 +59,17 @@ export function useParserAndValidationCache(): Plugin<{}> {
       validateFn: typeof validate
       setValidationFn: (fn: typeof validate) => void
     }) {
-      setValidationFn(function memoizedValidateFn(schema, document, rules) {
-        const rulesKey = rules?.map((rule) => rule.name).join(',') || ''
-        let memoizedValidateFnForRules = memoizedValidateByRules.get(rulesKey)
-        if (!memoizedValidateFnForRules) {
-          memoizedValidateFnForRules = memoize2of4(validateFn)
-          memoizedValidateByRules.set(rulesKey, memoizedValidateFnForRules)
-        }
-        return memoizedValidateFnForRules(schema, document, rules)
-      })
+      if (validationCache) {
+        setValidationFn(function memoizedValidateFn(schema, document, rules) {
+          const rulesKey = rules?.map((rule) => rule.name).join(',') || ''
+          let memoizedValidateFnForRules = memoizedValidateByRules.get(rulesKey)
+          if (!memoizedValidateFnForRules) {
+            memoizedValidateFnForRules = memoize2of4(validateFn)
+            memoizedValidateByRules.set(rulesKey, memoizedValidateFnForRules)
+          }
+          return memoizedValidateFnForRules(schema, document, rules)
+        })
+      }
     },
   }
 }

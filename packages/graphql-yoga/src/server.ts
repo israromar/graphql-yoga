@@ -55,7 +55,10 @@ import {
   useGraphiQL,
 } from './plugins/useGraphiQL.js'
 import { useHealthCheck } from './plugins/useHealthCheck.js'
-import { useParserAndValidationCache } from './plugins/useParserAndValidationCache.js'
+import {
+  ParserAndValidationCacheOptions,
+  useParserAndValidationCache,
+} from './plugins/useParserAndValidationCache.js'
 import { useRequestParser } from './plugins/useRequestParser.js'
 import { useResultProcessors } from './plugins/useResultProcessor.js'
 import { useSchema, YogaSchemaDefinition } from './plugins/useSchema.js'
@@ -345,8 +348,23 @@ export class YogaServer<
       {
         onPluginInit({ addPlugin }) {
           // Performance things
-          // @ts-expect-error Add plugins has context but this hook doesn't care
-          addPlugin(useParserAndValidationCache())
+          if (options?.parserCache !== false) {
+            const parserAndValidationCacheOptions: ParserAndValidationCacheOptions =
+              {}
+            if (typeof options?.parserCache === 'object') {
+              parserAndValidationCacheOptions.documentCache =
+                options.parserCache.documentCache
+              parserAndValidationCacheOptions.errorCache =
+                options.parserCache.errorCache
+              if (options.validationCache === false) {
+                parserAndValidationCacheOptions.validationCache = false
+              }
+            }
+            // @ts-expect-error Add plugins has context but this hook doesn't care
+            addPlugin(
+              useParserAndValidationCache(parserAndValidationCacheOptions),
+            )
+          }
           // @ts-expect-error Add plugins has context but this hook doesn't care
           addPlugin(useLimitBatching(batchingLimit))
           // @ts-expect-error Add plugins has context but this hook doesn't care
