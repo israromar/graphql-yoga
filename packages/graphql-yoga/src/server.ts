@@ -291,8 +291,6 @@ export class YogaServer<
       // Use the schema provided by the user
       !!options?.schema && useSchema(options!.schema),
 
-      // Performance things
-      useParserAndValidationCache(),
       options?.context != null &&
         useExtendContext((initialContext) => {
           if (options?.context) {
@@ -346,6 +344,9 @@ export class YogaServer<
       // To make sure those are called at the end
       {
         onPluginInit({ addPlugin }) {
+          // Performance things
+          // @ts-expect-error Add plugins has context but this hook doesn't care
+          addPlugin(useParserAndValidationCache())
           // @ts-expect-error Add plugins has context but this hook doesn't care
           addPlugin(useLimitBatching(batchingLimit))
           // @ts-expect-error Add plugins has context but this hook doesn't care

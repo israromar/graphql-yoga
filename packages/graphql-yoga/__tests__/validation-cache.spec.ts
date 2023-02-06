@@ -1,4 +1,4 @@
-import { createSchema, createYoga, Plugin } from 'graphql-yoga'
+import { createSchema, createYoga, Plugin } from '../src'
 import { validate } from 'graphql'
 
 describe('validation cache', () => {
