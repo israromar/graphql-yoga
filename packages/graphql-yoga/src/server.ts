@@ -292,7 +292,7 @@ export class YogaServer<
         specifiedRules,
       }),
       // Use the schema provided by the user
-      !!options?.schema && useSchema(options!.schema),
+      !!options?.schema && useSchema(options.schema),
 
       options?.context != null &&
         useExtendContext((initialContext) => {
@@ -360,8 +360,8 @@ export class YogaServer<
                 parserAndValidationCacheOptions.validationCache = false
               }
             }
-            // @ts-expect-error Add plugins has context but this hook doesn't care
             addPlugin(
+              // @ts-expect-error Add plugins has context but this hook doesn't care
               useParserAndValidationCache(parserAndValidationCacheOptions),
             )
           }
