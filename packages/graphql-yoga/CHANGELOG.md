@@ -1,5 +1,21 @@
 # graphql-yoga
 
+## 3.5.2
+
+### Patch Changes
+
+- [#2375](https://github.com/dotansimha/graphql-yoga/pull/2375) [`ddb2607d`](https://github.com/dotansimha/graphql-yoga/commit/ddb2607d5495245b360e29e38b826609ff93f2ce) Thanks [@renovate](https://github.com/apps/renovate)! - dependencies updates:
+
+  - Updated dependency [`@graphql-tools/executor@0.0.13` ↗︎](https://www.npmjs.com/package/@graphql-tools/executor/v/0.0.13) (from `0.0.12`, in `dependencies`)
+
+- [#2392](https://github.com/dotansimha/graphql-yoga/pull/2392) [`1caac99b`](https://github.com/dotansimha/graphql-yoga/commit/1caac99b39a09594d54402665a852e2933f0b7da) Thanks [@renovate](https://github.com/apps/renovate)! - dependencies updates:
+
+  - Updated dependency [`@whatwg-node/fetch@0.6.8` ↗︎](https://www.npmjs.com/package/@whatwg-node/fetch/v/0.6.8) (from `0.6.5`, in `dependencies`)
+  - Updated dependency [`@whatwg-node/server@0.6.3` ↗︎](https://www.npmjs.com/package/@whatwg-node/server/v/0.6.3) (from `0.5.11`, in `dependencies`)
+
+- [#2394](https://github.com/dotansimha/graphql-yoga/pull/2394) [`7587d5c5`](https://github.com/dotansimha/graphql-yoga/commit/7587d5c575bffb746d611cbbce36d2ee5cbe4f69) Thanks [@renovate](https://github.com/apps/renovate)! - dependencies updates:
+  - Updated dependency [`@graphql-tools/executor@^0.0.14` ↗︎](https://www.npmjs.com/package/@graphql-tools/executor/v/0.0.14) (from `^0.0.13`, in `dependencies`)
+
 ## 3.5.1
 
 ### Patch Changes
